@@ -1,19 +1,54 @@
-# Sagara Living — Consent-ready website
+# Sagara Living — Securiti JSON Form Extractor Ready
 
-Website static yang bisa di-deploy ke Vercel/Netlify/GitHub Pages. Tema homeware/slow living, dengan form consent yang siap dihubungkan ke backend Securiti.ai.
+Website ini mempertahankan desain Sagara Living dan mengubah form consent menjadi form HTML standar yang mudah dibaca oleh JSON Form Extractor.
 
-## Lokal
-`python -m http.server 8080`
+## Field yang diekstrak
 
-## Deploy
-Upload ke GitHub lalu import repository ke Vercel/Netlify.
+- `name`
+- `email`
+- `consent_email`
+- `consent_phone`
+- `consent_social_media`
+- `source`
 
-## Securiti.ai
-Frontend sudah menyiapkan `get consent payload` dan endpoint `/api/consent`. Set `DEMO_MODE=false` setelah backend proxy tersedia.
+Consent checkbox memakai `value="true"` dan `name` yang eksplisit.
 
-Endpoint reporting yang diberikan:
-`https://app2.securiti.ai/reporting/v1/sources/query?ref=getCmpConsentRecords`
+## JSON yang dibuat
 
-Endpoint ini diperlakukan sebagai endpoint read/reporting. Untuk menyimpan consent, endpoint create/update dari dokumentasi Securiti.ai masih perlu dipetakan.
+```json
+{
+  "subject": {
+    "name": "Budi",
+    "email": "budi@example.com"
+  },
+  "consent": {
+    "email": true,
+    "phone": false,
+    "social_media": true
+  },
+  "source": "sagara-living-website",
+  "collected_at": "2026-09-28T00:00:00.000Z"
+}
+```
 
-Jangan menaruh API token/secret Securiti.ai di JavaScript frontend.
+## Testing
+
+Saat ini `DEMO_MODE=true`, sehingga tidak ada data yang dikirim ke Securiti. Setelah plugin/extractor sudah dikonfigurasi, JSON dapat dilihat di browser DevTools Console.
+
+Payload terakhir juga tersedia melalui:
+
+```js
+window.lastSecuritiConsent
+```
+
+atau:
+
+```js
+window.SecuritiConsent.getJSON()
+```
+
+## Backend
+
+Form menggunakan `action="/api/consent"`. Untuk mengirim JSON ke Securiti, ubah `DEMO_MODE=false` setelah endpoint backend `/api/consent` tersedia.
+
+Jangan menaruh API token/secret Securiti di frontend.
